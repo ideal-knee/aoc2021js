@@ -8,7 +8,37 @@ const filter = (filterFn, iterable) => reiterate(function* () {
   }
 });
 
+const first = (iterable) => iterable.next().value;
+
+const flatten = (iterable) => reiterate(function* () {
+  for (const element of iterable) {
+    for (const subElement of element) {
+      yield subElement;
+    }
+  }
+});
+
 const getArgs = () => process.argv.slice(2);
+
+const map = (fn, iterable) => reiterate(function* () {
+  for (const element of iterable) {
+    yield fn(element);
+  }
+});
+
+const partition = (n, iterable) => reiterate(function* () {
+  let part = [];
+  for (const element of iterable) {
+    part.push(element);
+    if (part.length === n) {
+      yield part;
+      part = [];
+    }
+  }
+  if (part.length > 0) {
+    yield part;
+  }
+});
 
 const range = (...args) => {
   let start, end;
@@ -26,6 +56,14 @@ const range = (...args) => {
     }
   });
 };
+
+const realize = (iterable) => {
+  const result = [];
+  for (const element of iterable) {
+    result.push(element);
+  }
+  return result;
+}
 
 // TODO handle multiple iterables
 const reduce = (initialValue, reduceFn, iterable) => {
@@ -49,4 +87,4 @@ const slurpLines = async (fileName) => (await slurp(fileName)).trim().split("\n"
 
 const thread = (initial, ...fns) => fns.reduce((previousResult, fn) => fn(previousResult), initial);
 
-module.exports = { filter, getArgs, range, reduce, slurp, slurpLines, thread };
+module.exports = { filter, first, flatten, getArgs, map, partition, range, realize, reduce, slurp, slurpLines, thread };
